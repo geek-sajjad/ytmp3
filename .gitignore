@@ -1,0 +1,6 @@
+# Built binary
+/ytmp3
+# Partial downloads
+*.part
+# Downloaded audio
+*.mp3
