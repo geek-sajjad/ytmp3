@@ -4,3 +4,5 @@
 *.part
 # Downloaded audio
 *.mp3
+# GoReleaser output
+/dist

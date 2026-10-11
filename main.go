@@ -18,9 +18,13 @@ import (
 	"time"
 )
 
+// version is set at release time via -ldflags "-X main.version=...".
+var version = "dev"
+
 func main() {
 	outDir := flag.String("o", ".", "directory to save MP3 files in")
 	bitrate := flag.String("b", "192k", "MP3 bitrate (e.g. 128k, 192k, 320k)")
+	showVersion := flag.Bool("version", false, "print version and exit")
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage: %s [flags] [URL ...]\n\n", filepath.Base(os.Args[0]))
 		fmt.Fprintln(os.Stderr, "Downloads YouTube / YouTube Music audio as MP3.")
@@ -28,9 +32,13 @@ func main() {
 		flag.PrintDefaults()
 	}
 	flag.Parse()
+	if *showVersion {
+		fmt.Println("ytmp3", version)
+		return
+	}
 
 	if _, err := exec.LookPath("ffmpeg"); err != nil {
-		fatal("ffmpeg not found in PATH; install it first (e.g. sudo apt install ffmpeg)")
+		fatal("ffmpeg not found in PATH; install it first (see README)")
 	}
 	if err := os.MkdirAll(*outDir, 0o755); err != nil {
 		fatal("cannot create output directory: %v", err)

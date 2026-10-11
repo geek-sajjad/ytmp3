@@ -1,4 +1,4 @@
-module youtube-mp3-downloader
+module github.com/geek-sajjad/ytmp3
 
 go 1.26.0
 
