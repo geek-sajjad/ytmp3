@@ -6,3 +6,5 @@
 *.mp3
 # GoReleaser output
 /dist
+# Third-party binaries embedded in release builds (scripts/fetch-deps.sh)
+/deps

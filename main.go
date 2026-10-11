@@ -25,6 +25,7 @@ func main() {
 	outDir := flag.String("o", ".", "directory to save MP3 files in")
 	bitrate := flag.String("b", "192k", "MP3 bitrate (e.g. 128k, 192k, 320k)")
 	showVersion := flag.Bool("version", false, "print version and exit")
+	update := flag.Bool("update", false, "update yt-dlp to its latest version and exit")
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage: %s [flags] [URL ...]\n\n", filepath.Base(os.Args[0]))
 		fmt.Fprintln(os.Stderr, "Downloads YouTube / YouTube Music audio as MP3.")
@@ -34,6 +35,18 @@ func main() {
 	flag.Parse()
 	if *showVersion {
 		fmt.Println("ytmp3", version)
+		return
+	}
+
+	if err := setupBundledTools(); err != nil {
+		fatal("setting up bundled tools: %v", err)
+	}
+	if *update {
+		cmd := exec.Command("yt-dlp", "-U")
+		cmd.Stdout, cmd.Stderr = os.Stdout, os.Stderr
+		if err := cmd.Run(); err != nil {
+			fatal("updating yt-dlp: %v", err)
+		}
 		return
 	}
 

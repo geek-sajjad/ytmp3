@@ -1,11 +1,18 @@
 version: 2
 
+before:
+  hooks:
+    # ffmpeg, yt-dlp and deno are embedded into each binary (see bundle.go).
+    - sh scripts/fetch-deps.sh
+
 builds:
   - binary: ytmp3
     env:
       - CGO_ENABLED=0
     goos: [linux, darwin, windows]
     goarch: [amd64, arm64]
+    tags:
+      - bundled
     flags:
       - -trimpath
     ldflags:

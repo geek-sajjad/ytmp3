@@ -11,122 +11,89 @@ A link from a playlist (`&list=...`) downloads only that one video.
 
 ## Install
 
-ytmp3 is a single binary, but it needs two other tools at runtime:
+Release downloads come with everything included: ffmpeg, yt-dlp and deno
+(the JavaScript engine yt-dlp needs for YouTube) are built into the one
+file. You don't need to install anything else.
 
-- **ffmpeg** (required): converts the audio to MP3.
-- **yt-dlp** (strongly recommended): fetches the audio. Without it ytmp3 falls
-  back to a built-in Go client, which YouTube blocks (HTTP 403) for most music
-  videos. Keep it current with `yt-dlp -U`: YouTube changes often break old
-  versions.
+### One-line install (recommended)
 
-Pick your platform below. Every binary is on the
-[Releases page](https://github.com/geek-sajjad/ytmp3/releases/latest).
+**macOS / Linux**: open Terminal and run:
 
-### Windows
+```sh
+curl -fsSL https://raw.githubusercontent.com/geek-sajjad/ytmp3/main/install.sh | sh
+```
 
-1. Install the dependencies with [winget](https://learn.microsoft.com/windows/package-manager/winget/)
-   (built into Windows 10/11), in PowerShell:
+**Windows**: open PowerShell (Start → type "PowerShell") and run:
 
-   ```powershell
-   winget install Gyan.FFmpeg
-   winget install yt-dlp.yt-dlp
-   ```
+```powershell
+irm https://raw.githubusercontent.com/geek-sajjad/ytmp3/main/install.ps1 | iex
+```
 
-2. Download `ytmp3_<version>_windows_amd64.zip` from the
-   [Releases page](https://github.com/geek-sajjad/ytmp3/releases/latest)
-   (`windows_arm64` for ARM devices such as Snapdragon laptops).
-3. Extract `ytmp3.exe` to a folder, e.g. `C:\Tools\ytmp3`.
-4. Add that folder to your PATH: Start → "Edit environment variables for your
-   account" → **Path** → **Edit** → **New** → paste the folder path.
-5. Open a **new** terminal and check it works:
+The installer picks the right download for your computer, checks its
+checksum, and adds `ytmp3` to your PATH. Open a **new** terminal afterwards
+and check it works:
 
-   ```powershell
-   ytmp3 -version
-   ```
+```sh
+ytmp3 -version
+```
 
-Windows SmartScreen may warn that the file is from an unknown publisher,
-because the binary isn't code-signed. Click **More info → Run anyway**.
+The first time you download a song, ytmp3 spends a few seconds unpacking its
+bundled tools. It only does this once.
 
-### macOS
+### Manual download
 
-1. Install the dependencies with [Homebrew](https://brew.sh):
+1. Go to the [latest release](https://github.com/geek-sajjad/ytmp3/releases/latest)
+   and download the file for your computer:
 
-   ```sh
-   brew install ffmpeg yt-dlp
-   ```
+   | Computer                                | File                       |
+   |-----------------------------------------|----------------------------|
+   | Windows (most PCs)                      | `ytmp3_*_windows_amd64.zip`  |
+   | Windows on ARM (e.g. Snapdragon)        | `ytmp3_*_windows_arm64.zip`  |
+   | Mac with Apple Silicon (M1 and newer)   | `ytmp3_*_darwin_arm64.tar.gz` |
+   | Mac with Intel                          | `ytmp3_*_darwin_amd64.tar.gz` |
+   | Linux (most PCs)                        | `ytmp3_*_linux_amd64.tar.gz`  |
+   | Linux on ARM (e.g. Raspberry Pi 4/5)    | `ytmp3_*_linux_arm64.tar.gz`  |
 
-2. Download and install the binary. Use `darwin_arm64` for Apple Silicon
-   (M1 and later) or `darwin_amd64` for Intel Macs:
+2. Extract it (double-click on Windows and macOS, `tar -xzf` on Linux).
+3. Run it from a terminal in that folder: `./ytmp3` (macOS/Linux) or
+   `.\ytmp3.exe` (Windows). To run it from anywhere, move it into a folder on
+   your PATH.
 
-   ```sh
-   VERSION=1.0.0   # latest version from the Releases page, without the "v"
-   ARCH=arm64      # or amd64
-   curl -LO "https://github.com/geek-sajjad/ytmp3/releases/download/v${VERSION}/ytmp3_${VERSION}_darwin_${ARCH}.tar.gz"
-   tar -xzf "ytmp3_${VERSION}_darwin_${ARCH}.tar.gz" ytmp3
-   sudo mv ytmp3 /usr/local/bin/
-   ```
+**Security warnings**: the binaries aren't code-signed.
+- **Windows** SmartScreen may say "Windows protected your PC". Click
+  **More info → Run anyway**.
+- **macOS** may say the file "can't be opened" when you downloaded it in a
+  browser. Clear the quarantine flag once: `xattr -d com.apple.quarantine ./ytmp3`.
+  The one-line installer doesn't have this problem.
 
-3. The binary isn't signed by Apple, so Gatekeeper blocks it if you
-   downloaded it in a browser. Remove the quarantine flag once:
+### Uninstall
 
-   ```sh
-   xattr -d com.apple.quarantine /usr/local/bin/ytmp3
-   ```
+Delete the `ytmp3` binary (`~/.local/bin/ytmp3`, or
+`%LOCALAPPDATA%\Programs\ytmp3` on Windows) and its unpacked tools:
 
-4. Check it works: `ytmp3 -version`
+- Linux: `~/.cache/ytmp3`
+- macOS: `~/Library/Caches/ytmp3`
+- Windows: `%LOCALAPPDATA%\ytmp3`
 
-### Linux
+### From source
 
-1. Install ffmpeg from your package manager:
-
-   ```sh
-   sudo apt install ffmpeg      # Debian / Ubuntu
-   sudo dnf install ffmpeg      # Fedora (needs RPM Fusion)
-   sudo pacman -S ffmpeg        # Arch
-   ```
-
-2. Install yt-dlp. Distro packages are usually outdated, so use the
-   official release:
-
-   ```sh
-   mkdir -p ~/.local/bin
-   curl -L -o ~/.local/bin/yt-dlp https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux
-   chmod +x ~/.local/bin/yt-dlp
-   ```
-
-3. Download and install ytmp3 (`linux_amd64` or `linux_arm64`, e.g. for a
-   Raspberry Pi):
-
-   ```sh
-   VERSION=1.0.0   # latest version from the Releases page, without the "v"
-   ARCH=amd64      # or arm64
-   curl -LO "https://github.com/geek-sajjad/ytmp3/releases/download/v${VERSION}/ytmp3_${VERSION}_linux_${ARCH}.tar.gz"
-   tar -xzf "ytmp3_${VERSION}_linux_${ARCH}.tar.gz" ytmp3
-   mv ytmp3 ~/.local/bin/
-   ```
-
-   Make sure `~/.local/bin` is in your PATH.
-
-4. Check it works: `ytmp3 -version`
-
-### From source (any OS)
-
-With Go 1.26+ installed (an older Go fetches the right toolchain
-automatically):
+With Go 1.26+ installed:
 
 ```sh
 go install github.com/geek-sajjad/ytmp3@latest
 ```
 
-Or clone and build:
+A plain source build doesn't include the bundled tools, so it uses
+`ffmpeg`, `yt-dlp` and `deno` (or `node`) from your PATH. Install them
+yourself first, e.g. `brew install ffmpeg yt-dlp deno` or
+`winget install Gyan.FFmpeg`, `winget install yt-dlp.yt-dlp` and
+`winget install DenoLand.Deno`. To build the
+self-contained version instead:
 
 ```sh
-git clone https://github.com/geek-sajjad/ytmp3.git
-cd ytmp3
-go build -o ytmp3 .
+scripts/fetch-deps.sh linux_amd64     # your <os>_<arch>
+go build -tags bundled -o ytmp3 .
 ```
-
-You still need ffmpeg and yt-dlp as described above.
 
 ## Usage
 
@@ -146,15 +113,16 @@ ytmp3 -o ~/Music -b 320k "https://music.youtube.com/watch?v=VIDEO_ID"
 |------------|---------|--------------------------|
 | `-o`       | `.`     | Output directory         |
 | `-b`       | `192k`  | MP3 bitrate              |
+| `-update`  |         | Update yt-dlp and exit   |
 | `-version` |         | Print version and exit   |
 
 ## Troubleshooting
 
-- **`HTTP 403` / "YouTube blocked the download"**: install yt-dlp, or update
-  it with `yt-dlp -U`.
-- **`ffmpeg not found in PATH`**: install ffmpeg and open a new terminal.
-- yt-dlp needs a JavaScript runtime for some videos. ytmp3 uses `deno` if
-  installed, otherwise `node`.
+- **Downloads suddenly fail** (`HTTP 403`, "Sign in to confirm", "unable to
+  extract"): YouTube changed something and yt-dlp needs updating. Run
+  `ytmp3 -update`, or install the latest ytmp3 release.
+- **`ytmp3: command not found`**: open a new terminal so the PATH change
+  takes effect.
 
 ## Releasing
 
@@ -166,5 +134,20 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
-The workflow builds Windows, macOS and Linux binaries (amd64 + arm64),
-packages them with checksums and attaches them to a GitHub Release.
+The workflow runs `scripts/fetch-deps.sh` to download ffmpeg, yt-dlp (the
+latest version) and deno, builds Windows, macOS and Linux binaries (amd64 +
+arm64) with them embedded, and attaches the archives and checksums to a
+GitHub Release. Releasing regularly keeps the bundled yt-dlp fresh.
+
+## Bundled software
+
+Release binaries include these third-party programs, unmodified, under
+their own licenses:
+
+- [FFmpeg](https://ffmpeg.org) 6.1.1, static builds from
+  [eugeneware/ffmpeg-static](https://github.com/eugeneware/ffmpeg-static/releases/tag/b6.1.1)
+  (GPL v3; source at [ffmpeg.org](https://ffmpeg.org/download.html#releases))
+- [yt-dlp](https://github.com/yt-dlp/yt-dlp) (Unlicense)
+- [Deno](https://github.com/denoland/deno) (MIT)
+
+Pinned versions are in `scripts/fetch-deps.sh`.
